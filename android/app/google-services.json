@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "820352235911",
+    "firebase_url": "https://portfolio-8cba5-default-rtdb.firebaseio.com",
+    "project_id": "portfolio-8cba5",
+    "storage_bucket": "portfolio-8cba5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:820352235911:android:197a669d3af9b76d60fb22",
+        "android_client_info": {
+          "package_name": "com.map_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWlKQn6Y4BR0rmRSIbEfCRTNhpr8tnIWY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:820352235911:android:f842d015fc7e2ff460fb22",
+        "android_client_info": {
+          "package_name": "com.testapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWlKQn6Y4BR0rmRSIbEfCRTNhpr8tnIWY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
