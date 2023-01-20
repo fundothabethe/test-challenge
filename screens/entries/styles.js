@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     alignSelf: 'center',
     alignContent: 'center',
+    marginVertical: 20,
   },
   wrapper: {
     flex: 0.5,
@@ -54,6 +55,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   big_text: {},
+  list_wrapper: {
+    margin: 10,
+    backgroundColor: '#dedede',
+    padding: 10,
+    borderRadius: 20,
+  },
+  text: {
+    color: '#333',
+  },
 });
 
 export default styles;

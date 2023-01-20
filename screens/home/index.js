@@ -45,7 +45,6 @@ const Home = ({navigation: {navigate}}) => {
         style={styles.map_style}
         provider={PROVIDER_GOOGLE}
         loadingEnabled
-        showsUserLocation={true}
         followsUserLocation={true}
         onUserLocationChange={place => {
           console.log(place);
@@ -55,9 +54,11 @@ const Home = ({navigation: {navigate}}) => {
           longitude: 27.889815,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
-        }}
-      />
-
+        }}>
+        {!!Object.keys(current_location).length && (
+          <Marker title="Your location" coordinate={current_location} />
+        )}
+      </MapView>
       <View style={styles.inputs_section}>
         <Text style={styles.small_text}>Capture location data</Text>
         <TextInput

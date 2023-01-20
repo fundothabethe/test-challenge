@@ -2,6 +2,7 @@ import {View, Text} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
+import styles from './styles';
 
 const Entries = () => {
   const [location_data, set_location_data] = useState(new Array());
@@ -15,19 +16,16 @@ const Entries = () => {
 
   return (
     <View>
-      <Text>Entries</Text>
-
+      <Text style={styles.login_text}>Entries</Text>
       <View>
         {!!location_data.length &&
-          location_data.map(location => (
-            <View>
-              <View>
-                <Text>{location.latitude + ' ' + location.longitude}</Text>
-              </View>
-              <Text>
-                {location.location_feature_1}
-                {location.location_feature_2}
+          location_data.map((location, idx) => (
+            <View style={styles.list_wrapper} key={idx}>
+              <Text style={styles.text}>
+                {location.latitude + ', ' + location.longitude}
               </Text>
+              <Text style={styles.text}>{location.location_feature_1}</Text>
+              <Text style={styles.text}>{location.location_feature_2}</Text>
             </View>
           ))}
       </View>
