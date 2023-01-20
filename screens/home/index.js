@@ -10,16 +10,32 @@ const Home = ({navigation: {navigate}}) => {
   const [location_feature_1, set_location_feature_1] = useState('');
   const [location_feature_2, set_location_feature_2] = useState('');
   const [current_location, set_current_location] = useState(new Object());
+  const [location_data, set_location_data] = useState([]);
 
-  // useEffect(() => {}, []);
+  useEffect(() => {
+    const get_data = database()
+      .ref(auth().currentUser.uid + '/location_data')
+      .on('value', data => data.exists() && set_location_data(data.val()));
+
+    return () => get_data;
+  }, []);
 
   const save_data = () => {
     database()
-      .ref(auth().currentUser.uid + '/location_data')
+      .ref(auth().currentUser.uid)
       .update({
-        location: current_location,
-        location_feature_1,
-        location_feature_2,
+        location_data: [
+          ...location_data,
+          {
+            location: current_location,
+            location_feature_1,
+            location_feature_2,
+          },
+        ],
+      })
+      .then(() => {
+        set_location_feature_1('');
+        set_location_feature_2('');
       });
   };
 
@@ -49,7 +65,6 @@ const Home = ({navigation: {navigate}}) => {
           style={styles.input}
           onChangeText={text => set_location_feature_1(text)}
           value={location_feature_1}
-          secureTextEntry
           placeholderTextColor="#999"
         />
         <TextInput
@@ -57,7 +72,6 @@ const Home = ({navigation: {navigate}}) => {
           style={styles.input}
           onChangeText={text => set_location_feature_2(text)}
           value={location_feature_2}
-          secureTextEntry
           placeholderTextColor="#999"
         />
         <View style={styles.row}>
@@ -72,7 +86,7 @@ const Home = ({navigation: {navigate}}) => {
               },
             ]}
             onPress={() => save_data()}>
-            <Text style={styles.camera_btn_text}>Open Camera</Text>
+            <Text style={styles.camera_btn_text}>Submit data</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[
@@ -84,9 +98,18 @@ const Home = ({navigation: {navigate}}) => {
               },
             ]}
             onPress={() => navigate('Camera')}>
-            <Text style={styles.camera_btn_text}>Open Camera</Text>
+            <Text style={styles.camera_btn_text}>Camera</Text>
           </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          style={[
+            // styles.camera_btn,
+
+            {paddingTop: 20},
+          ]}
+          onPress={() => navigate('Entries')}>
+          <Text style={styles.camera_btn_text}>View recent entries</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

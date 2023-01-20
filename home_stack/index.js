@@ -7,6 +7,7 @@ import Spinner from '../components/spinner';
 import Sign_up from '../screens/sign-up';
 import Home from '../screens/home';
 import Camera from '../screens/camera';
+import Entries from '../screens/entries';
 const Stack = createNativeStackNavigator();
 
 const Home_stack = () => {
@@ -40,6 +41,14 @@ const Home_stack = () => {
           <Stack.Screen
             name="Camera"
             component={Camera}
+            options={{
+              headerShown: false,
+            }}
+          />
+
+          <Stack.Screen
+            name="Entries"
+            component={Entries}
             options={{
               headerShown: false,
             }}

@@ -1,27 +1,21 @@
 import {View, Text} from 'react-native';
 import React from 'react';
-import {RNCamera} from 'react-native-camera';
+import {
+  CameraDeviceFormat,
+  CameraRuntimeError,
+  FrameProcessorPerformanceSuggestion,
+  PhotoFile,
+  sortFormats,
+  useCameraDevices,
+  useFrameProcessor,
+  Camera,
+  VideoFile,
+  frameRateIncluded,
+} from 'react-native-vision-camera';
 import styles from './styles';
 
-const Camera = () => {
-  return (
-    <View>
-      <RNCamera
-        style={styles.preview}
-        type={RNCamera.Constants.Type.back}
-        flashMode={RNCamera.Constants.FlashMode.on}
-        androidCameraPermissionOptions={{
-          title: 'Permission to use camera',
-          message: 'We need your permission to use your camera',
-          buttonPositive: 'Ok',
-          buttonNegative: 'Cancel',
-        }}
-        onGoogleVisionBarcodesDetected={({barcodes}) => {
-          console.log(barcodes);
-        }}
-      />
-    </View>
-  );
+const Camera_apge = () => {
+  return <View></View>;
 };
 
-export default Camera;
+export default Camera_apge;
