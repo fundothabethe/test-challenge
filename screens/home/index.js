@@ -4,6 +4,7 @@ import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
 import styles from './styles';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
+import Module from '../../Module';
 
 const Home = ({navigation: {navigate}}) => {
   const [coords, set_coords] = useState(new Object());
@@ -11,14 +12,45 @@ const Home = ({navigation: {navigate}}) => {
   const [location_feature_2, set_location_feature_2] = useState('');
   const [current_location, set_current_location] = useState(new Object());
   const [location_data, set_location_data] = useState([]);
-
+  let location_ = {};
   useEffect(() => {
-    const get_data = database()
-      .ref(auth().currentUser.uid + '/location_data')
-      .on('value', data => data.exists() && set_location_data(data.val()));
+    const get_data = database().ref(auth().currentUser.uid + '/location_data');
 
-    return () => get_data;
+    get_data.on(
+      'value',
+      data => data.exists() && set_location_data(data.val()),
+    );
+
+    const interval = setInterval(() => get_location_data(), 1000);
+
+    return () => {
+      Module.stop_tracking();
+      clearInterval(interval);
+      get_data.off('value');
+    };
   }, []);
+
+  // useEffect(() => console.log(current_location), [current_location]);
+
+  const get_location_data = () =>
+    Module.get_location(_ => {
+      const location_data = _.split(' ');
+      // console.log(location_data);
+      if (
+        location_data[0] != 'null' &&
+        location_data[1] != 'null' &&
+        location_data[0] != NaN &&
+        location_data[1] != NaN
+      )
+        location_ = {
+          latitude: parseFloat(location_data[0]),
+          longitude: parseFloat(location_data[1]),
+        };
+      set_current_location(location_);
+    });
+
+  //
+  const turn_on_location = () => Module.turn_on_location(_ => console.log(_));
 
   const save_data = () => {
     database()
@@ -27,7 +59,7 @@ const Home = ({navigation: {navigate}}) => {
         location_data: [
           ...location_data,
           {
-            location: current_location,
+            location: location_,
             location_feature_1,
             location_feature_2,
           },
@@ -46,9 +78,6 @@ const Home = ({navigation: {navigate}}) => {
         provider={PROVIDER_GOOGLE}
         loadingEnabled
         followsUserLocation={true}
-        onUserLocationChange={place => {
-          console.log(place);
-        }}
         initialRegion={{
           latitude: -26.118294,
           longitude: 27.889815,
@@ -75,6 +104,9 @@ const Home = ({navigation: {navigate}}) => {
           value={location_feature_2}
           placeholderTextColor="#999"
         />
+        <Text style={styles.camera_btn_text}>
+          {current_location.latitude + ' ' + current_location.longitude}
+        </Text>
         <View style={styles.row}>
           <TouchableOpacity
             style={[
@@ -86,6 +118,7 @@ const Home = ({navigation: {navigate}}) => {
                 borderTopLeftRadius: 20,
               },
             ]}
+            // onPress={() => get_location_data()}>
             onPress={() => save_data()}>
             <Text style={styles.camera_btn_text}>Submit data</Text>
           </TouchableOpacity>
