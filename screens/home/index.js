@@ -1,4 +1,10 @@
-import {View, Text, TextInput, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  PermissionsAndroid,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
 import styles from './styles';
@@ -10,18 +16,22 @@ const Home = ({navigation: {navigate}}) => {
   const [coords, set_coords] = useState(new Object());
   const [location_feature_1, set_location_feature_1] = useState('');
   const [location_feature_2, set_location_feature_2] = useState('');
-  const [current_location, set_current_location] = useState(new Object());
+  const [current_location, set_current_location] = useState({});
   const [location_data, set_location_data] = useState([]);
-  let location_ = {};
+
+  const [change_state, set_change_state] = useState(false);
+  const get_data = database().ref(auth().currentUser.uid + '/location_data');
+
   useEffect(() => {
-    const get_data = database().ref(auth().currentUser.uid + '/location_data');
+    location_permission().then(() =>
+      Module.turn_on_location(_ => console.log(_)),
+    );
+    const interval = setInterval(() => get_location_data(), 1000);
 
     get_data.on(
       'value',
       data => data.exists() && set_location_data(data.val()),
     );
-
-    const interval = setInterval(() => get_location_data(), 1000);
 
     return () => {
       Module.stop_tracking();
@@ -34,60 +44,84 @@ const Home = ({navigation: {navigate}}) => {
 
   const get_location_data = () =>
     Module.get_location(_ => {
-      const location_data = _.split(' ');
-      // console.log(location_data);
+      const location = {
+        latitude: parseFloat(_.split(' ')[0]),
+        longitude: parseFloat(_.split(' ')[1]),
+      };
+      console.log(location);
+      const is_float = n => Number(n) === n && n % 1 !== 0;
+
       if (
-        location_data[0] != 'null' &&
-        location_data[1] != 'null' &&
-        location_data[0] != NaN &&
-        location_data[1] != NaN
-      )
-        location_ = {
-          latitude: parseFloat(location_data[0]),
-          longitude: parseFloat(location_data[1]),
-        };
-      set_current_location(location_);
+        Number(location.latitude) === location.latitude &&
+        location.latitude % 1 !== 0 &&
+        Number(location.longitude) === location.longitude &&
+        location.longitude % 1 !== 0
+      ) {
+        set_current_location(location);
+      } else {
+        console.log('whier');
+      }
     });
 
   //
-  const turn_on_location = () => Module.turn_on_location(_ => console.log(_));
 
-  const save_data = () => {
-    database()
+  const location_permission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      );
+      if (!granted) Alert.alert('Access Denied', 'Canot use camera.');
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  const save_data = async () =>
+    await database()
       .ref(auth().currentUser.uid)
       .update({
         location_data: [
           ...location_data,
           {
-            location: location_,
             location_feature_1,
             location_feature_2,
           },
         ],
       })
       .then(() => {
+        console.log('feature data data saved');
+        console.log({
+          location_feature_1,
+          location_feature_2,
+        });
         set_location_feature_1('');
         set_location_feature_2('');
-      });
-  };
+      })
+      .catch(_ => console.log(_));
 
   return (
     <View style={styles.container}>
-      <MapView
-        style={styles.map_style}
-        provider={PROVIDER_GOOGLE}
-        loadingEnabled
-        followsUserLocation={true}
-        initialRegion={{
-          latitude: -26.118294,
-          longitude: 27.889815,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }}>
-        {!!Object.keys(current_location).length && (
-          <Marker title="Your location" coordinate={current_location} />
-        )}
-      </MapView>
+      {!!Object.keys(current_location).length && (
+        <>
+          <MapView
+            style={styles.map_style}
+            provider={PROVIDER_GOOGLE}
+            loadingEnabled
+            region={{
+              ...current_location,
+              latitudeDelta: 0.0,
+              longitudeDelta: 0.005,
+            }}
+            followsUserLocation={true}
+            initialRegion={{
+              ...current_location,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}>
+            <Marker title="Your location" coordinate={current_location} />
+          </MapView>
+        </>
+      )}
       <View style={styles.inputs_section}>
         <Text style={styles.small_text}>Capture location data</Text>
         <TextInput
@@ -131,7 +165,11 @@ const Home = ({navigation: {navigate}}) => {
                 borderBottomRightRadius: 20,
               },
             ]}
-            onPress={() => navigate('Camera')}>
+            onPress={() => {
+              Module.stop_tracking();
+              get_data.off('value');
+              navigate('Camera');
+            }}>
             <Text style={styles.camera_btn_text}>Camera</Text>
           </TouchableOpacity>
         </View>

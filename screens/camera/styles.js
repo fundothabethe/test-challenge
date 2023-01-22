@@ -1,5 +1,5 @@
 import {StyleSheet} from 'react-native';
-import {width} from '../../shared/global-styles';
+import {height, width} from '../../shared/global-styles';
 
 const styles = StyleSheet.create({
   container: {
@@ -21,6 +21,16 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     color: '#333',
     marginVertical: 10,
+  },
+  btn: {
+    alignSelf: 'center',
+    position: 'absolute',
+    bottom: 20,
+    justifyContent: 'center',
+  },
+  img: {
+    width: width,
+    height: height - 200,
   },
 });
 
